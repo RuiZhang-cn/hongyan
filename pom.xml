@@ -65,6 +65,12 @@
             <artifactId>hutool-extra</artifactId>
             <version>5.8.4</version>
         </dependency>
+<!--        二维码 -->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.3.3</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
+import static com.rui.hongyan.utils.OptionalUtil.getOrDefault;
+
 /**
  * @author by Rui
  * @Description
@@ -17,9 +19,7 @@ public class RandomStringFunction implements HongYanBaseFunction{
     @Override
     public String apply(HttpServletRequest request, HttpServletResponse response) {
         return RandomUtil.randomString(
-                Optional.ofNullable(request.getParameter("length"))
-                        .map(Integer::parseInt)
-                        .orElse(10)
+                getOrDefault(request.getParameter("length"),10)
         );
     }
 }
