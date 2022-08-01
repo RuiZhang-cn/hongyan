@@ -2,7 +2,6 @@ package com.rui.hongyan.config;
 
 import cn.hutool.core.codec.Morse;
 import cn.hutool.core.img.ImgUtil;
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.text.CharPool;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
@@ -12,15 +11,13 @@ import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.rui.hongyan.function.HongYanBaseFunction;
 import com.rui.hongyan.function.RandomStringFunction;
-import static com.rui.hongyan.utils.OptionalUtil.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.Optional;
+
+import static com.rui.hongyan.utils.OptionalUtil.getOrDefault;
 
 /**
  * @author by Rui
@@ -49,7 +46,7 @@ public class HongYanFunctionConfig {
         );
     }
 
-    @Bean(name = {"getMyRequestByRequest"})
+    @Bean(name = {"获取请求信息"})
     public HongYanBaseFunction getMyRequestByRequest(){
         return (request, response) -> {
             JSONObject header = new JSONObject();
@@ -67,12 +64,12 @@ public class HongYanFunctionConfig {
         };
     }
 
-    @Bean(name = {"getClientIP"})
+    @Bean(name = {"我的IP","ip"})
     public HongYanBaseFunction getClientIP(){
         return (request, response) ->ServletUtil.getClientIP(request);
     }
 
-    @Bean(name = {"getRandomInt"})
+    @Bean(name = {"随机数字"})
     public HongYanBaseFunction getRandomInt(){
         return (request, response) ->RandomUtil.randomNumbers(
                 getOrDefault(request.getParameter("length"),10)
