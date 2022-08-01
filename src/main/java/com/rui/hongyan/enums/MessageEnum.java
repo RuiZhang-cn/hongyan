@@ -15,6 +15,12 @@ public enum MessageEnum {
      */
     VALUE_TOO_LONG("VALUE长度超出限制"),
     /**
+     * 密码错误
+     */
+    PASSWORD_ERROR("密码错误"),
+    SUCCESS("操作成功"),
+    ERROR("操作失败"),
+    /**
      * 未查询到该KEY
      */
     KEY_NOT_FOUND("未查询到该KEY");

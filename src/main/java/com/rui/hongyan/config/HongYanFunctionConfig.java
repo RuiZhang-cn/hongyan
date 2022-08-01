@@ -1,7 +1,9 @@
 package com.rui.hongyan.config;
 
+import cn.hutool.core.codec.Morse;
 import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.text.CharPool;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
@@ -27,6 +29,13 @@ import java.util.Optional;
  */
 @Configuration
 public class HongYanFunctionConfig {
+
+    @Bean(name = {"样例方法"})
+    public HongYanBaseFunction sampleMethod(){
+        return (request, response) ->{
+            return getOrDefault(request.getParameter("参数名"), "默认参数");
+        };
+    }
 
     @Bean(name = {"randomString","随机字符串"})
     public RandomStringFunction randomStringFunction(){
@@ -91,4 +100,20 @@ public class HongYanFunctionConfig {
         };
     }
 
+    @Bean(name = {"摩斯密码"})
+    public HongYanBaseFunction morseCoder(){
+        return (request, response) ->{
+            String text = request.getParameter("text");
+            if (text == null) {
+                return "参数text不能为空";
+            }
+            Morse morse = new Morse();
+            char firstChar = text.charAt(0);
+            if (firstChar == CharPool.DOT|| firstChar ==CharPool.DASHED){
+                return morse.decode(text);
+            }else {
+                return morse.encode(text);
+            }
+        };
+    }
 }
