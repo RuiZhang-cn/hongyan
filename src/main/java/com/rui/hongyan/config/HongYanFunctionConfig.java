@@ -1,8 +1,11 @@
 package com.rui.hongyan.config;
 
 import cn.hutool.core.codec.Morse;
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.text.CharPool;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
@@ -111,6 +114,31 @@ public class HongYanFunctionConfig {
             }else {
                 return morse.encode(text);
             }
+        };
+    }
+
+    @Bean(name = {"时间戳转换"})
+    public HongYanBaseFunction timestamp(){
+        return (request, response) ->{
+            JSONObject root = new JSONObject();
+            String date = request.getParameter("date");
+            if (date==null){
+                long timeMillis = System.currentTimeMillis();
+                root.set("当前时间戳(毫秒)", timeMillis);
+                root.set("当前时间戳(秒)", timeMillis/1000);
+                root.set("当前时间", new DateTime().toString());
+                return JSONUtil.toJsonPrettyStr(root);
+            }
+            if (NumberUtil.isNumber(date)) {
+                long parseLong = Long.parseLong(date);
+                root.set("时间戳转换后(毫秒)", new DateTime(parseLong).toString());
+                root.set("时间戳转换后(秒)", new DateTime(parseLong*1000).toString());
+                return JSONUtil.toJsonPrettyStr(root);
+            }
+            DateTime dateTime = DateUtil.parse(date);
+            root.set("时间转换后(毫秒)", dateTime.getTime());
+            root.set("时间转换后(秒)", dateTime.getTime()/1000);
+            return JSONUtil.toJsonPrettyStr(root);
         };
     }
 }
