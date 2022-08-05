@@ -2,12 +2,15 @@ package com.rui.hongyan.modules.hongyanmaptable.controller;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.rui.hongyan.config.HongYanConfig;
 import com.rui.hongyan.function.HongYanBaseFunction;
 import com.rui.hongyan.modules.hongyanmaptable.entity.HongyanMapTable;
 import com.rui.hongyan.modules.hongyanmaptable.service.IDynamicMethodService;
 import com.rui.hongyan.modules.hongyanmaptable.service.IHongyanMapTableService;
 import com.rui.hongyan.modules.hongyanmaptable.vo.HongyanMapTableSaveVo;
+import com.rui.hongyan.utils.VerificationUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.util.Arrays;
 import java.util.Date;
 
 import static com.rui.hongyan.constants.MessageConstant.*;
@@ -38,11 +42,23 @@ public class HongyanController {
     @Qualifier("configurableListableBeanFactory")
     private ConfigurableListableBeanFactory configurableListableBeanFactory;
 
-    @Value("${maxKeyLength:20}")
-    private Integer maxKeyLength;
+    @Autowired
+    private VerificationUtil verificationUtil;
+    @GetMapping("/")
+    public String getAllMethodName(){
+        // 返回所有方法bean的name #只取第一个名字#
+        String[] beanNamesForType = configurableListableBeanFactory.getBeanNamesForType(HongYanBaseFunction.class);
+        return Arrays.toString(beanNamesForType);
+    }
+
 
     @GetMapping("/{key}")
     public String getValueByKey(@PathVariable String key, HttpServletResponse response, HttpServletRequest request) {
+        if (StrUtil.isEmpty(key)){
+            // 返回所有方法的相关信息
+            String[] beanNamesForType = configurableListableBeanFactory.getBeanNamesForType(HongYanBaseFunction.class);
+            return Arrays.toString(beanNamesForType);
+        }
         // 如果是方法直接进行处理
         if (configurableListableBeanFactory.containsBean(key)) {
             return dynamicMethodService.executeProcessing(
@@ -63,16 +79,31 @@ public class HongyanController {
     @PostMapping("/{key}")
     public String setValueByKey(@PathVariable String key,
                                 @RequestBody HongyanMapTableSaveVo hongyanMapTable) {
-        if (key.length() > maxKeyLength) {
-            return KEY_TOO_LONG;
+        VerificationUtil.CheckDto checkDto = verificationUtil.checkLength(key.length(), hongyanMapTable.getValue().length());
+        if (!checkDto.isCheckStatus()){
+            return checkDto.getCheckMessage();
         }
         hongyanMapTableService.save(hongyanMapTable.setKey(key).toHongyanMapTable());
+        return SUCCESS;
+    }
+
+    @PostMapping("/{key}/{value}")
+    public String setValueByKey(@PathVariable String key,
+                                @PathVariable String value) {
+        VerificationUtil.CheckDto checkDto = verificationUtil.checkLength(key.length(), value.length());
+        if (!checkDto.isCheckStatus()){
+            return checkDto.getCheckMessage();
+        }
+        hongyanMapTableService.save(new HongyanMapTable(key,value,null));
         return SUCCESS;
     }
 
     @PutMapping("/{key}")
     public String editValueByKey(@PathVariable String key,
                                  @RequestBody HongyanMapTableSaveVo hongyanMapTable) {
+        if (!verificationUtil.checkValueLength(hongyanMapTable.getValue().length())){
+            return VALUE_TOO_LONG;
+        }
         HongyanMapTable mapTable = hongyanMapTableService.getOne(
                 Wrappers.lambdaQuery(HongyanMapTable.class)
                         .eq(HongyanMapTable::getKey, key)

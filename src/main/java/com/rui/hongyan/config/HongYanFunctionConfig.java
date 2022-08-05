@@ -3,21 +3,31 @@ package com.rui.hongyan.config;
 import cn.hutool.core.codec.Morse;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.exceptions.UtilException;
 import cn.hutool.core.img.ImgUtil;
+import cn.hutool.core.lang.Console;
 import cn.hutool.core.text.CharPool;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.URLUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import cn.hutool.extra.servlet.ServletUtil;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.rui.hongyan.function.HongYanBaseFunction;
 import com.rui.hongyan.function.RandomStringFunction;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Enumeration;
 
 import static com.rui.hongyan.utils.OptionalUtil.getOrDefault;
@@ -29,6 +39,8 @@ import static com.rui.hongyan.utils.OptionalUtil.getOrDefault;
  */
 @Configuration
 public class HongYanFunctionConfig {
+    @Autowired
+    private HongYanConfig hongYanConfig;
 
     @Bean(name = {"样例方法"})
     public HongYanBaseFunction sampleMethod(){
@@ -84,7 +96,7 @@ public class HongYanFunctionConfig {
         return (request, response) ->{
             String url = request.getParameter("url");
             if (StrUtil.isEmpty(url)){
-                return "url参数不能为空！";
+                return "生成二维码功能需传递参数url例:/生成二维码?url=baidu.com,此外也可以生成文本的二维码";
             }
             try {
                 QrCodeUtil.generate(
@@ -105,7 +117,7 @@ public class HongYanFunctionConfig {
         return (request, response) ->{
             String text = request.getParameter("text");
             if (text == null) {
-                return "参数text不能为空";
+                return "摩斯密码功能需传递参数text如 /摩斯密码?text=a,自动识别加密或者解密";
             }
             Morse morse = new Morse();
             char firstChar = text.charAt(0);
@@ -127,6 +139,7 @@ public class HongYanFunctionConfig {
                 root.set("当前时间戳(毫秒)", timeMillis);
                 root.set("当前时间戳(秒)", timeMillis/1000);
                 root.set("当前时间", new DateTime().toString());
+                root.set("介绍", "时间戳转换功能需要转递date参数自动识别要转换成时间或者时间戳,不传递默认返回当前时间");
                 return JSONUtil.toJsonPrettyStr(root);
             }
             if (NumberUtil.isNumber(date)) {
@@ -139,6 +152,34 @@ public class HongYanFunctionConfig {
             root.set("时间转换后(毫秒)", dateTime.getTime());
             root.set("时间转换后(秒)", dateTime.getTime()/1000);
             return JSONUtil.toJsonPrettyStr(root);
+        };
+    }
+
+    @Bean(name = {"代理下载"})
+    public HongYanBaseFunction proxyDownload(){
+        return (request, response) ->{
+            String url = request.getParameter("url");
+            if (StrUtil.isEmpty(url)){
+                return "代理下载功能,可用于下载github等国外网站的资源,需要传递参数url,例如/代理下载?url=http://baidu.com/1.txt,流量有限,请勿滥用.";
+            }
+            try {
+                URL http = URLUtil.toUrlForHttp(url);
+                long contentLength = HttpRequest.head(url).execute().contentLength();
+                if (contentLength>hongYanConfig.getMaxProxyDownloadFileSize()){
+                    return "文件大小为:"+contentLength + "超出限制!";
+                }
+            } catch (UtilException e) {
+                return e.getMessage();
+            }
+            response.setContentType("multipart/form-data");
+            response.setCharacterEncoding("UTF-8");
+            response.setHeader("Content-Disposition", "attachment;filename="+url.substring(url.lastIndexOf("/")));
+            try {
+                HttpUtil.download(url,response.getOutputStream(), true);
+            } catch (IOException e) {
+                return e.getMessage();
+            }
+            return "nop";
         };
     }
 }

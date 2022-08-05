@@ -34,8 +34,11 @@ public class HongyanMapTable implements Serializable {
     private String password;
 
     public HongyanMapTable(String key, String value, String password) {
+        Date date = new Date();
         this.key = key;
         this.value = value;
         this.password = password;
+        this.createdAt = date;
+        this.updatedAt = date;
     }
 }
