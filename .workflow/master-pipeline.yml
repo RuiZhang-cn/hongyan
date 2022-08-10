@@ -1,51 +1,84 @@
 version: '1.0'
 name: master-pipeline
 displayName: MasterPipeline
-stages:
-  - stage: 
-    name: compile
-    displayName: 编译
-    steps:
-      - step: build@maven
-        name: build_maven
-        displayName: Maven 构建
-        # 支持6、7、8、9、10、11六个版本
-        jdkVersion: 8
-        # 支持2.2.1、3.2.5、3.3.9、3.5.2、3.5.3、3.5.4、3.6.1、3.6.3八个版本
-        mavenVersion: 3.3.9
-        # 构建命令
-        commands:
-          - mvn -B clean package -Dmaven.test.skip=true
-        # 非必填字段，开启后表示将构建产物暂存，但不会上传到制品库中，7天后自动清除
-        artifacts:
-            # 构建产物名字，作为产物的唯一标识可向下传递，支持自定义，默认为BUILD_ARTIFACT。在下游可以通过${BUILD_ARTIFACT}方式引用来获取构建物地址
-          - name: BUILD_ARTIFACT
-            # 构建产物获取路径，是指代码编译完毕之后构建物的所在路径，如通常jar包在target目录下。当前目录为代码库根目录
-            path:
-              - ./target
-      - step: publish@general_artifacts
-        name: publish_general_artifacts
-        displayName: 上传制品
-        # 上游构建任务定义的产物名，默认BUILD_ARTIFACT
-        dependArtifact: BUILD_ARTIFACT
-        # 上传到制品库时的制品命名，默认output
-        artifactName: output
-        dependsOn: build_maven
-  - stage: 
-    name: release
-    displayName: 发布
-    steps:
-      - step: publish@release_artifacts
-        name: publish_release_artifacts
-        displayName: '发布'
-        # 上游上传制品任务的产出
-        dependArtifact: output
-        # 发布制品版本号
-        version: '1.0.0.0'
-        # 是否开启版本号自增，默认开启
-        autoIncrement: true
 triggers:
+  trigger: auto
   push:
     branches:
       include:
         - master
+stages:
+  - name: compile
+    displayName: 编译
+    strategy: naturally
+    trigger: auto
+    steps:
+      - step: build@maven
+        name: build_maven
+        displayName: Maven 构建
+        jdkVersion: 8
+        mavenVersion: 3.3.9
+        commands:
+          - mvn -B clean package -Dmaven.test.skip=true
+        artifacts:
+          - name: BUILD_ARTIFACT
+            path:
+              - ./target
+        strategy: {}
+      - step: publish@general_artifacts
+        name: publish_general_artifacts
+        displayName: 上传制品
+        dependArtifact: BUILD_ARTIFACT
+        artifactName: output
+        strategy: {}
+        dependsOn: build_maven
+  - name: release
+    displayName: 发布
+    strategy: naturally
+    trigger: auto
+    steps:
+      - step: publish@release_artifacts
+        name: publish_release_artifacts
+        displayName: 发布
+        dependArtifact: output
+        version: 1.0.0.0
+        autoIncrement: true
+        strategy: {}
+  - name: stage-ee61ecea
+    displayName: 主机部署
+    strategy: naturally
+    trigger: auto
+    executor: []
+    steps:
+      - step: deploy@agent
+        name: deploy_agent
+        displayName: 主机部署
+        hostGroupID: PROD
+        deployArtifact:
+          - source: artifact
+            name: output
+            target: ~/gitee_go/deploy
+            artifactRepository: default
+            artifactName: output
+            artifactVersion: latest
+        script:
+          - '# 功能：部署脚本会在部署主机组的每台机器上执行'
+          - '# 使用场景：先将制品包解压缩到指定目录中，再执行启动脚本deploy.sh，脚本示例地址：https://gitee.com/gitee-go/spring-boot-maven-deploy-case/blob/master/deploy.sh'
+          - '# mkdir -p /home/admin/app'
+          - '# tar zxvf ~/gitee_go/deploy/output.tar.gz -C /home/admin/app'
+          - '# sh /home/admin/app/deploy.sh restart'
+          - '# 如果你是php之类的无需制品包的制品方式，可以使用 git clone 或者 git pull 将源代码更新到服务器，再执行其他命令'
+          - '# git clone ***@***.git'
+          - cd ~/gitee_go/deoloy
+          - ls
+          - tar -zxf output.tar.gz
+          - cd target
+          - mv hongyan-0.0.1-SNAPSHOT.jar /opt/hongyan/hongyan-0.0.1-SNAPSHOT.jar
+          - cd /opt/hongyan
+          - 'nohup java -jar hongyan-0.0.1-SNAPSHOT.jar & '
+          - echo "Deploy Success"
+          - sleep 10
+          - curl 127.0.0.1:80
+        notify: []
+        strategy:
+          retry: '0'
