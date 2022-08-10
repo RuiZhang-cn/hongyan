@@ -44,6 +44,7 @@ public class HongyanController {
 
     @Autowired
     private VerificationUtil verificationUtil;
+
     @GetMapping("/")
     public String getAllMethodName(){
         // 返回所有方法bean的name #只取第一个名字#
@@ -54,10 +55,9 @@ public class HongyanController {
 
     @GetMapping("/{key}")
     public String getValueByKey(@PathVariable String key, HttpServletResponse response, HttpServletRequest request) {
-        if (StrUtil.isEmpty(key)){
+        if (StrUtil.isBlank(key)){
             // 返回所有方法的相关信息
-            String[] beanNamesForType = configurableListableBeanFactory.getBeanNamesForType(HongYanBaseFunction.class);
-            return Arrays.toString(beanNamesForType);
+            return getAllMethodName();
         }
         // 如果是方法直接进行处理
         if (configurableListableBeanFactory.containsBean(key)) {

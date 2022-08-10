@@ -74,7 +74,7 @@ public class HongYanFunctionConfig {
                 header.set(headerKey, headerValue);
             }
             root.set("url", request.getRequestURL());
-            if (request.getContentType().equalsIgnoreCase(ContentType.JSON.getValue())){
+            if (request.getContentType()!=null&&request.getContentType().equalsIgnoreCase(ContentType.JSON.getValue())){
                 try {
                     String value = new String(IoUtil.readBytes(request.getInputStream(), false), StandardCharsets.UTF_8);
                     root.set("args", JSONUtil.parse(value));
