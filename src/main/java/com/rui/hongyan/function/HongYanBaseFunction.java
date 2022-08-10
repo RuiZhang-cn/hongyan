@@ -9,6 +9,7 @@ import java.util.function.BiFunction;
  * @Date 2022/07/29 上午 09:44
  * @author by Rui
  */
+@FunctionalInterface
 public interface HongYanBaseFunction extends BiFunction<HttpServletRequest,HttpServletResponse,String> {
 
 }

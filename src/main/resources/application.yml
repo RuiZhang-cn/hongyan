@@ -28,9 +28,12 @@ spring:
       filter:
         stat:
           log-slow-sql: true
+      # 监控界面配置
       stat-view-servlet:
         enabled: true
         url-pattern: /druid/*
         login-username: rui
         login-password: 04e42c57bcb24c5a81c9fe9cff33760d
         reset-enable: true
+server:
+  port: 80

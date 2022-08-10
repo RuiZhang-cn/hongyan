@@ -76,14 +76,15 @@ public class HongyanController {
         return hongyanMapTable.getValue();
     }
 
-    @PostMapping("/{key}")
+    @PostMapping("/{key}/{value}/{password}")
     public String setValueByKey(@PathVariable String key,
-                                @RequestBody HongyanMapTableSaveVo hongyanMapTable) {
-        VerificationUtil.CheckDto checkDto = verificationUtil.checkLength(key.length(), hongyanMapTable.getValue().length());
+                                @PathVariable String value,
+                                @PathVariable String password) {
+        VerificationUtil.CheckDto checkDto = verificationUtil.checkLength(key.length(), value.length());
         if (!checkDto.isCheckStatus()){
             return checkDto.getCheckMessage();
         }
-        hongyanMapTableService.save(hongyanMapTable.setKey(key).toHongyanMapTable());
+        hongyanMapTableService.save(new HongyanMapTable(key,value,password));
         return SUCCESS;
     }
 
@@ -96,6 +97,18 @@ public class HongyanController {
         }
         hongyanMapTableService.save(new HongyanMapTable(key,value,null));
         return SUCCESS;
+    }
+
+    @PostMapping("/{key}")
+    public String setValueByKey(@PathVariable String key,HttpServletResponse response, HttpServletRequest request) {
+        if (configurableListableBeanFactory.containsBean(key)) {
+            return dynamicMethodService.executeProcessing(
+                    configurableListableBeanFactory.getBean(key, HongYanBaseFunction.class),
+                    request,
+                    response);
+        }else {
+            return KEY_NOT_FOUND;
+        }
     }
 
     @PutMapping("/{key}")
