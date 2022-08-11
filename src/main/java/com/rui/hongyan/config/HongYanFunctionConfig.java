@@ -7,6 +7,7 @@ import cn.hutool.core.exceptions.UtilException;
 import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
+import cn.hutool.core.net.URLDecoder;
 import cn.hutool.core.text.CharPool;
 import cn.hutool.core.util.*;
 import cn.hutool.extra.qrcode.QrCodeUtil;
@@ -73,7 +74,7 @@ public class HongYanFunctionConfig {
                 String headerValue = request.getHeader(headerKey);
                 header.set(headerKey, headerValue);
             }
-            root.set("url", request.getRequestURL());
+            root.set("url", URLDecoder.decode(request.getRequestURL().toString(),StandardCharsets.UTF_8));
             if (request.getContentType()!=null&&request.getContentType().equalsIgnoreCase(ContentType.JSON.getValue())){
                 try {
                     String value = new String(IoUtil.readBytes(request.getInputStream(), false), StandardCharsets.UTF_8);
