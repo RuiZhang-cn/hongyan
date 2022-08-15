@@ -15,5 +15,5 @@ public interface MessageConstant {
     String KEY_NOT_FOUND="KEY未查询到";
     String KEY_TOO_LONG=KEY+TOO_LONG;
     String VALUE_TOO_LONG=VALUE+TOO_LONG;
-    String DELETE_IS_NOT_SUPPORTED="未设置密码的key不可删除";
+    String DELETE_IS_NOT_SUPPORTED="未设置密码的key不可删除/修改";
 }

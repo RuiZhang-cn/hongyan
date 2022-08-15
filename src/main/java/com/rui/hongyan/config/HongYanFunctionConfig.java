@@ -13,10 +13,12 @@ import cn.hutool.core.net.URLDecoder;
 import cn.hutool.core.text.CharPool;
 import cn.hutool.core.util.*;
 import cn.hutool.extra.qrcode.QrCodeUtil;
+import cn.hutool.extra.servlet.JakartaServletUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.ContentType;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
+import cn.hutool.http.Method;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.rui.hongyan.function.HongYanBaseFunction;
@@ -196,9 +198,12 @@ public class HongYanFunctionConfig {
         };
     }
 
-    @Bean(name = {"上传文件","uploadFiles"})
-    public HongYanBaseFunction uploadImage() {
+    @Bean(name = {"上传文件","uploadFile"})
+    public HongYanBaseFunction uploadFile() {
         return (request, response) -> {
+            if (false==JakartaServletUtil.METHOD_POST.equals(request.getMethod())){
+                return "此方法只支持POST请求";
+            }
             if (request instanceof MultipartHttpServletRequest) {
                 MultipartHttpServletRequest mRequest = (MultipartHttpServletRequest) request;
                 Iterator<String> files = mRequest.getFileNames();
@@ -214,9 +219,9 @@ public class HongYanFunctionConfig {
                     File tempFile = FileUtil.createTempFile(newFileName, null, true);
                     try {
                         file.transferTo(tempFile);
-                        String resBody = HttpRequest.post("https://c6cgg225g6h1m0ol6ocg.baseapi.memfiredb.com/storage/v1/object/randomchat/" + newFileName)
-                                .header("apikey", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiZXhwIjozMTc1MzM5MDI2LCJpYXQiOjE2Mzc0MTkwMjYsImlzcyI6InN1cGFiYXNlIn0.XACnBFPeQVwXJvTamLFywWzsnwonq7nV9xDZGOrzM1w")
-                                .header("authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiZXhwIjozMTc1MzM5MDI2LCJpYXQiOjE2Mzc0MTkwMjYsImlzcyI6InN1cGFiYXNlIn0.XACnBFPeQVwXJvTamLFywWzsnwonq7nV9xDZGOrzM1w")
+                        String resBody = HttpRequest.post(hongYanConfig.getUploadFileUrl() + newFileName)
+                                .header("apikey", hongYanConfig.getUploadFileApikey())
+                                .header("authorization", "Bearer "+ hongYanConfig.getUploadFileApikey())
                                 .form("body",tempFile)
                                 .execute()
                                 .body();
@@ -225,7 +230,7 @@ public class HongYanFunctionConfig {
                         if (!entries.containsKey("Key")) {
                             resJson.set(next, entries.toString());
                         }else {
-                            resJson.set(next, "https://c6cgg225g6h1m0ol6ocg.baseapi.memfiredb.com/storage/v1/object/public/randomchat/"+newFileName);
+                            resJson.set(next, hongYanConfig.getUploadFilePreviewUrl()+newFileName);
                         }
                     } catch (IOException e) {
                         throw new RuntimeException(e);

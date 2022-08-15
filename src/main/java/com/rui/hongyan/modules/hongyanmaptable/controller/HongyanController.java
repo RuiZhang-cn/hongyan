@@ -114,6 +114,10 @@ public class HongyanController {
     @PutMapping("/{key}")
     public String editValueByKey(@PathVariable String key,
                                  @RequestBody HongyanMapTableSaveVo hongyanMapTable) {
+        // 未设置密码的不允许修改
+        if (StrUtil.isEmpty(hongyanMapTable.getPassword())){
+            return DELETE_IS_NOT_SUPPORTED;
+        }
         if (!verificationUtil.checkValueLength(hongyanMapTable.getValue().length())){
             return VALUE_TOO_LONG;
         }
@@ -124,7 +128,7 @@ public class HongyanController {
         if (mapTable == null) {
             return KEY_NOT_FOUND;
         }
-        if (StrUtil.isEmpty(mapTable.getPassword()) || mapTable.getPassword().equals(hongyanMapTable.getPassword())) {
+        if (mapTable.getPassword().equals(hongyanMapTable.getPassword())) {
             boolean updateStatus = hongyanMapTableService.updateById(
                     mapTable.setValue(hongyanMapTable.getValue())
                             .setUpdatedAt(new Date())
