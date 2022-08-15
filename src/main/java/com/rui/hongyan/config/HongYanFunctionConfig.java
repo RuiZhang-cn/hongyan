@@ -1,8 +1,10 @@
 package com.rui.hongyan.config;
 
 import cn.hutool.core.codec.Morse;
+import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.date.format.FastDateFormat;
 import cn.hutool.core.exceptions.UtilException;
 import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.io.FileUtil;
@@ -51,19 +53,19 @@ public class HongYanFunctionConfig {
         };
     }
 
-    @Bean(name = {"随机字符串"})
+    @Bean(name = {"随机字符串","randomString"})
     public RandomStringFunction randomStringFunction() {
         return new RandomStringFunction();
     }
 
-    @Bean(name = {"随机密码"})
+    @Bean(name = {"随机密码","RandomPassWord"})
     public HongYanBaseFunction getRandomPassWord() {
         return (request, response) -> RandomUtil.randomString(RandomUtil.BASE_CHAR_NUMBER + "~!@#$%^&*_+.,",
                 getOrDefault(request.getParameter("length"), 10)
         );
     }
 
-    @Bean(name = {"获取请求信息"})
+    @Bean(name = {"获取请求信息","myreq"})
     public HongYanBaseFunction getMyRequestByRequest() {
         return (request, response) -> {
             JSONObject header = new JSONObject();
@@ -95,14 +97,14 @@ public class HongYanFunctionConfig {
         return (request, response) -> ServletUtil.getClientIP(request);
     }
 
-    @Bean(name = {"随机数字"})
+    @Bean(name = {"随机数字","RandomInt"})
     public HongYanBaseFunction getRandomInt() {
         return (request, response) -> RandomUtil.randomNumbers(
                 getOrDefault(request.getParameter("length"), 10)
         );
     }
 
-    @Bean(name = {"生成二维码"})
+    @Bean(name = {"生成二维码","qrcode"})
     public HongYanBaseFunction generateQrCode() {
         return (request, response) -> {
             String url = request.getParameter("url");
@@ -123,7 +125,7 @@ public class HongYanFunctionConfig {
         };
     }
 
-    @Bean(name = {"摩斯密码"})
+    @Bean(name = {"摩斯密码","morse"})
     public HongYanBaseFunction morseCoder() {
         return (request, response) -> {
             String text = request.getParameter("text");
@@ -140,7 +142,7 @@ public class HongYanFunctionConfig {
         };
     }
 
-    @Bean(name = {"时间戳转换"})
+    @Bean(name = {"时间转换","date"})
     public HongYanBaseFunction timestamp() {
         return (request, response) -> {
             JSONObject root = new JSONObject();
@@ -150,7 +152,7 @@ public class HongYanFunctionConfig {
                 root.set("当前时间戳(毫秒)", timeMillis);
                 root.set("当前时间戳(秒)", timeMillis / 1000);
                 root.set("当前时间", new DateTime().toString());
-                root.set("介绍", "时间戳转换功能需要转递date参数自动识别要转换成时间或者时间戳,不传递默认返回当前时间");
+                root.set("介绍", "时间转换功能需要转递date参数自动识别要转换成时间或者时间戳,不传递默认返回当前时间");
                 return JSONUtil.toJsonPrettyStr(root);
             }
             if (NumberUtil.isNumber(date)) {
