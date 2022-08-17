@@ -7,7 +7,7 @@ hongyan 是一个 终端便利的多功能聚合网站,免费提供各种方便�
 本项目由JAVA语言编写,使用了Hutool工具包简化开发,本项目代码简单,扩展容易,理解更容易,
 欢迎大家参与贡献,希望它能成为你在github/gitee上参与贡献的第一个仓库!
 详情请移动至**参与贡献**内有代码编写帮助
-**参与贡献并非只有提交代码,提交BUG/建议/修改README的错字/修改描述让人更易理解均是对项目的贡献**
+**参与贡献并非只有提交代码,提交BUG/建议/修改错字/修改描述让人更易理解均是对项目的贡献**
 
 #### 可以做什么
 ##### 文本传输
@@ -20,10 +20,34 @@ curl -X POST --location "http://localhost:80/测试KEY/测试VALUE"
 ```
 
 即成功设置了一个key为测试KEY，value为测试VALUE的对象
-接下来在浏览器访问：http://localhost:8080/测试KEY/
+接下来在浏览器访问：http://localhost:8080/测试KEY
 或者：`curl -X GET --location "http://localhost:80/测试KEY"`
 即可查询对应的value
+##### 设置方法和参数作为值
+可以设置如下格式的VALUE来实现调用方法
+如: `method:获取请求信息?arg=参数1&arg2=参数2`
 
+其中`method:`是固定前缀,`获取请求信息`是要调用的方法,`?arg=参数1&arg2=参数2`是要传递的参数,使用url参数格式
+
+例:`curl -X POST --location "http://localhost:80/dtff1/method:获取请求信息?arg=%E5%8F%82%E6%95%B01"`
+
+返回值:
+```json
+{
+    "url": "http://localhost/获取请求信息",
+    "args": {
+        "arg": [
+            "参数1"
+        ]
+    },
+    "header": {
+        "host": "localhost:80",
+        "connection": "Keep-Alive",
+        "user-agent": "Apache-HttpClient/4.5.13 (Java/17.0.3)",
+        "accept-encoding": "gzip,deflate"
+    }
+}
+```
 ##### 检查更新
 
 可以储存一个key为xx软件版本号,value为版本号(0.11)
@@ -39,7 +63,7 @@ curl -X POST --location "http://localhost:80/测试KEY/测试VALUE"
 返回你这次请求的所有请求信息 可用于验证代码或者curl命令是否有问题
 ```json
 {
-  "url": "http://localhost/%E8%8E%B7%E5%8F%96%E8%AF%B7%E6%B1%82%E4%BF%A1%E6%81%AF",
+  "url": "http://localhost/获取请求信息",
   "args": {
   },
   "header": {
@@ -99,7 +123,7 @@ lambda表达式参考HongYanFunctionConfig.样例方法
 
 最后在方法上加入@Bean(name = {"样例方法"})注解,name属性是个数组,用户输入数组中的任何值都可以访问到该方法
 
-*请勿和其他方法重复,请勿命名太多个*
+*请勿和其他方法/已被存储数据的KEY 重复,请勿命名太多个*
 
 *在所有方法接口中只展示第一个名字*
 
@@ -109,5 +133,7 @@ lambda表达式参考HongYanFunctionConfig.样例方法
 
 #### 致谢
 感谢JetBrains提供的开发工具!
+
 感谢MemFire Cloud提供的免费数据库!
+
 感谢项目中使用到的所有开源项目!
