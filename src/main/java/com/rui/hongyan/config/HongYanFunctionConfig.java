@@ -1,24 +1,24 @@
 package com.rui.hongyan.config;
 
 import cn.hutool.core.codec.Morse;
-import cn.hutool.core.date.DatePattern;
 import cn.hutool.core.date.DateTime;
 import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.date.format.FastDateFormat;
 import cn.hutool.core.exceptions.UtilException;
 import cn.hutool.core.img.ImgUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.net.URLDecoder;
 import cn.hutool.core.text.CharPool;
-import cn.hutool.core.util.*;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.NumberUtil;
+import cn.hutool.core.util.RandomUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import cn.hutool.extra.servlet.JakartaServletUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.ContentType;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
-import cn.hutool.http.Method;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.rui.hongyan.function.HongYanBaseFunction;
@@ -31,7 +31,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -178,7 +177,6 @@ public class HongYanFunctionConfig {
                 return "代理下载功能,可用于下载github等国外网站的资源,需要传递参数url,例如/代理下载?url=http://baidu.com/1.txt,流量有限,请勿滥用.";
             }
             try {
-                URL http = URLUtil.toUrlForHttp(url);
                 long contentLength = HttpRequest.head(url).execute().contentLength();
                 if (contentLength > hongYanConfig.getMaxProxyDownloadFileSize()) {
                     return "文件大小为:" + contentLength + "超出限制!";
