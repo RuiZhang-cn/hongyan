@@ -2,7 +2,7 @@ package com.rui.hongyan.modules.hongyanmaptable.controller;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.rui.hongyan.config.HongYanConfig;
+import com.rui.hongyan.constants.StringPool;
 import com.rui.hongyan.function.HongYanBaseFunction;
 import com.rui.hongyan.modules.hongyanmaptable.entity.HongyanMapTable;
 import com.rui.hongyan.modules.hongyanmaptable.service.IDynamicMethodService;
@@ -10,18 +10,16 @@ import com.rui.hongyan.modules.hongyanmaptable.service.IHongyanMapTableService;
 import com.rui.hongyan.modules.hongyanmaptable.vo.HongyanMapTableSaveVo;
 import com.rui.hongyan.utils.VerificationUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.constraints.Length;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import java.util.Arrays;
-import java.util.Date;
+import java.io.IOException;
+import java.util.*;
 
 import static com.rui.hongyan.constants.MessageConstant.*;
 
@@ -53,8 +51,18 @@ public class HongyanController {
     }
 
 
-    @GetMapping("/{key}")
-    public String getValueByKey(@PathVariable String key, HttpServletResponse response, HttpServletRequest request) {
+    @RequestMapping(value = "/{key}",method = {RequestMethod.GET,RequestMethod.POST})
+    public String getValueByKey(@PathVariable String key,
+                                HttpServletRequest request,
+                                HttpServletResponse response) {
+        return getValueByKey(key,null, request, response);
+    }
+
+    @GetMapping("/{key}/{password}")
+    public String getValueByKey(@PathVariable String key,
+                                @PathVariable String password,
+                                HttpServletRequest request,
+                                HttpServletResponse response) {
         if (StrUtil.isBlank(key)){
             // 返回所有方法的相关信息
             return getAllMethodName();
@@ -73,16 +81,43 @@ public class HongyanController {
         if (hongyanMapTable == null) {
             return KEY_NOT_FOUND;
         }
-        return hongyanMapTable.getValue();
+        if (StrUtil.isEmpty(hongyanMapTable.getPassword())&&Objects.equals(password,hongyanMapTable.getPassword())) {
+            return PASSWORD_ERROR;
+        }
+        String value = hongyanMapTable.getValue();
+        if (value.startsWith(StringPool.METHOD_PREFIX)) {
+            value = value.substring(StringPool.METHOD_PREFIX.length());
+            try {
+                request.getRequestDispatcher(StringPool.SLASH+value).forward(request,response);
+            } catch (ServletException | IOException e) {
+                throw new RuntimeException(e);
+            }
+            return null;
+        }
+        return value;
     }
 
     @PostMapping("/{key}/{value}/{password}")
     public String setValueByKey(@PathVariable String key,
                                 @PathVariable String value,
-                                @PathVariable String password) {
+                                @PathVariable String password,
+                                HttpServletRequest request) {
         VerificationUtil.CheckDto checkDto = verificationUtil.checkLength(key.length(), value.length());
         if (!checkDto.isCheckStatus()){
             return checkDto.getCheckMessage();
+        }
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        if (!parameterMap.isEmpty()){
+            StringJoiner stringJoiner = new StringJoiner(StringPool.AMPERSAND, value+StringPool.QUESTION_MARK, StringPool.EMPTY);
+            StringBuilder argBuilder = new StringBuilder(3);
+            for (Map.Entry<String, String[]> stringEntry : parameterMap.entrySet()) {
+                stringJoiner.add(argBuilder.append(stringEntry.getKey())
+                        .append(StringPool.EQUALS)
+                        .append(stringEntry.getValue()[0])
+                        .toString());
+                argBuilder.delete(0,argBuilder.length());
+            }
+            value=stringJoiner.toString();
         }
         hongyanMapTableService.save(new HongyanMapTable(key,value,password));
         return SUCCESS;
@@ -90,26 +125,11 @@ public class HongyanController {
 
     @PostMapping("/{key}/{value}")
     public String setValueByKey(@PathVariable String key,
-                                @PathVariable String value) {
-        VerificationUtil.CheckDto checkDto = verificationUtil.checkLength(key.length(), value.length());
-        if (!checkDto.isCheckStatus()){
-            return checkDto.getCheckMessage();
-        }
-        hongyanMapTableService.save(new HongyanMapTable(key,value,null));
-        return SUCCESS;
+                                @PathVariable String value,
+                                HttpServletRequest request) {
+        return setValueByKey(key, value,null,request);
     }
 
-    @PostMapping("/{key}")
-    public String setValueByKey(@PathVariable String key,HttpServletResponse response, HttpServletRequest request) {
-        if (configurableListableBeanFactory.containsBean(key)) {
-            return dynamicMethodService.executeProcessing(
-                    configurableListableBeanFactory.getBean(key, HongYanBaseFunction.class),
-                    request,
-                    response);
-        }else {
-            return KEY_NOT_FOUND;
-        }
-    }
 
     @PutMapping("/{key}")
     public String editValueByKey(@PathVariable String key,
