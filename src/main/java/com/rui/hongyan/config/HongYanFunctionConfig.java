@@ -244,4 +244,21 @@ public class HongYanFunctionConfig {
             }
         };
     }
+
+    @Bean(name = {"重定向","redirect"})
+    public HongYanBaseFunction redirect() {
+        return (request, response) -> {
+            String url = request.getParameter("url");
+            if (StrUtil.isEmpty(url)) {
+                return "重定向功能需传递参数url,值为要跳转的链接,如?url=baidu.com";
+            }
+            try {
+                response.sendRedirect(url);
+                return null;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        };
+    }
 }
