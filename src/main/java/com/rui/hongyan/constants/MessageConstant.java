@@ -13,6 +13,7 @@ public interface MessageConstant {
     String SUCCESS="成功";
     String ERROR="失败";
     String KEY_NOT_FOUND="KEY未查询到";
+    String KEY_EXIST="KEY已存在";
     String KEY_TOO_LONG=KEY+TOO_LONG;
     String VALUE_TOO_LONG=VALUE+TOO_LONG;
     String DELETE_IS_NOT_SUPPORTED="未设置密码的key不可删除/修改";

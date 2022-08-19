@@ -15,6 +15,8 @@ import org.springframework.stereotype.Component;
 @Data
 public class HongYanConfig {
     private int maxKeyLength=20;
+    private int bloomFilterMinLength=100000;
+    private int bloomFilterKeyHashTimes=4;
     private int maxValueLength=2000;
     private int maxProxyDownloadFileSize=300000;
     private String uploadFileUrl="https://c6cgg225g6h1m0ol6ocg.baseapi.memfiredb.com/storage/v1/object/randomchat/";

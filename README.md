@@ -74,15 +74,15 @@ curl -X POST --location "http://localhost:80/测试KEY/测试VALUE"
   }
 }
 ```
-###### 时间戳转换
-`curl http://localhost:80/时间戳`
+###### 时间转换
+`curl http://localhost:80/时间转换`
 默认返回当前时间和时间戳
 ```json
 {
     "当前时间戳(毫秒)": 1660181822793,
     "当前时间戳(秒)": 1660181822,
     "当前时间": "2022-08-11 09:37:02",
-    "介绍": "时间戳转换功能需要转递date参数自动识别要转换成时间或者时间戳,不传递默认返回当前时间"
+    "介绍": "时间转换功能需要转递date参数自动识别要转换成时间或者时间戳,不传递默认返回当前时间"
 }
 ```
 ###### 摩斯密码
@@ -132,8 +132,8 @@ lambda表达式参考HongYanFunctionConfig.样例方法
 建议在用户未传递参数时返回方法的简单介绍,如HongYanFunctionConfig.生成二维码
 
 #### 致谢
-感谢JetBrains提供的开发工具!
+感谢[JetBrains](https://www.jetbrains.com/zh-cn/)提供的开发工具!
 
-感谢MemFire Cloud提供的免费数据库!
+感谢[MemFire Cloud](https://memfiredb.com/)提供的免费数据库!
 
 感谢项目中使用到的所有开源项目!

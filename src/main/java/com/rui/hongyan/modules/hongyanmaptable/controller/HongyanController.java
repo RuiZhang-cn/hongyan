@@ -3,6 +3,7 @@ package com.rui.hongyan.modules.hongyanmaptable.controller;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.rui.hongyan.constants.StringPool;
+import com.rui.hongyan.filters.KeyBloomFilter;
 import com.rui.hongyan.function.HongYanBaseFunction;
 import com.rui.hongyan.modules.hongyanmaptable.entity.HongyanMapTable;
 import com.rui.hongyan.modules.hongyanmaptable.service.IDynamicMethodService;
@@ -43,6 +44,9 @@ public class HongyanController {
     @Autowired
     private VerificationUtil verificationUtil;
 
+    @Autowired
+    private KeyBloomFilter keyBloomFilter;
+
     @GetMapping("/")
     public String getAllMethodName(){
         // 返回所有方法bean的name #只取第一个名字#
@@ -73,6 +77,10 @@ public class HongyanController {
                     configurableListableBeanFactory.getBean(key, HongYanBaseFunction.class),
                     request,
                     response);
+        }
+        if (!keyBloomFilter.contains(key)){
+            log.debug("key:{}一定不存在,被布隆过滤器拦截",key);
+            return KEY_NOT_FOUND;
         }
         HongyanMapTable hongyanMapTable = hongyanMapTableService.getOne(
                 Wrappers.lambdaQuery(HongyanMapTable.class)
@@ -105,6 +113,16 @@ public class HongyanController {
         VerificationUtil.CheckDto checkDto = verificationUtil.checkLength(key.length(), value.length());
         if (!checkDto.isCheckStatus()){
             return checkDto.getCheckMessage();
+        }
+        if (keyBloomFilter.contains(key)){
+            log.debug("key:{}有可能存在,被布隆过滤器拦截",key);
+            long count = hongyanMapTableService.count(
+                    Wrappers.lambdaQuery(HongyanMapTable.class)
+                            .eq(HongyanMapTable::getKey, key)
+            );
+            if (count > 0) {
+                return KEY_EXIST;
+            }
         }
         Map<String, String[]> parameterMap = request.getParameterMap();
         if (!parameterMap.isEmpty()){
