@@ -67,7 +67,7 @@ stages:
           - '# sh /home/admin/app/deploy.sh restart'
           - '# 如果你是php之类的无需制品包的制品方式，可以使用 git clone 或者 git pull 将源代码更新到服务器，再执行其他命令'
           - '# git clone ***@***.git'
-          - cd ~/gitee_go/deoloy
+          - cd ~/gitee_go/deploy
           - tar -zxf output.tar.gz
           - cd target
           - mv hongyan-0.0.1-SNAPSHOT.jar /opt/hongyan/hongyan-0.0.1-SNAPSHOT.jar
