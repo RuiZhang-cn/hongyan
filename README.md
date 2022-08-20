@@ -133,7 +133,7 @@ lambda表达式参考HongYanFunctionConfig.样例方法
 
 #### 致谢
 感谢[JetBrains](https://www.jetbrains.com/zh-cn/)提供的开发工具!
-https://cloud.memfiredb.com/auth/login?from=fZA8As
+
 感谢[MemFire Cloud](https://cloud.memfiredb.com/auth/login?from=fZA8As)提供的免费数据库!
 
 感谢项目中使用到的所有开源项目!
