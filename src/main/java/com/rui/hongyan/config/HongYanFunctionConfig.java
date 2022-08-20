@@ -95,7 +95,7 @@ public class HongYanFunctionConfig {
 
     @Bean(name = {"我的IP", "ip"})
     public HongYanBaseFunction getClientIP() {
-        return (request, response) -> ServletUtil.getClientIP(request);
+        return (request, response) -> ServletUtil.getClientIP(request,"cf-connecting-ip");
     }
 
     @Bean(name = {"随机数字","RandomInt"})
