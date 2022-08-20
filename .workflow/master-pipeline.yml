@@ -70,7 +70,8 @@ stages:
           - cd ~/gitee_go/deploy
           - tar -zxf output.tar.gz
           - cd target
-          - mv hongyan-0.0.1-SNAPSHOT.jar /opt/hongyan/hongyan-0.0.1-SNAPSHOT.jar
+          - sh /opt/hongyan/stop.sh
+          - mv -b -f hongyan-0.0.1-SNAPSHOT.jar /opt/hongyan/hongyan-0.0.1-SNAPSHOT.jar
           - cd /opt/hongyan
           - 'nohup java -jar hongyan-0.0.1-SNAPSHOT.jar & '
           - echo "Deploy Success"
