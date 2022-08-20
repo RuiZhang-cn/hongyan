@@ -85,12 +85,10 @@ public class HongyanController {
         HongyanMapTable hongyanMapTable = hongyanMapTableService.getOne(
                 Wrappers.lambdaQuery(HongyanMapTable.class)
                         .eq(HongyanMapTable::getKey, key)
+                        .eq(StrUtil.isNotEmpty(password),HongyanMapTable::getPassword,password)
         );
         if (hongyanMapTable == null) {
-            return KEY_NOT_FOUND;
-        }
-        if (StrUtil.isEmpty(hongyanMapTable.getPassword())&&Objects.equals(password,hongyanMapTable.getPassword())) {
-            return PASSWORD_ERROR;
+            return KEY_NOT_FOUND_OR_KEY_EXIST;
         }
         String value = hongyanMapTable.getValue();
         if (value.startsWith(StringPool.METHOD_PREFIX)) {
