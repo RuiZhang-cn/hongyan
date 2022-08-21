@@ -73,10 +73,10 @@ stages:
           - cd ~/gitee_go/deploy
           - tar -zxf output.tar.gz
           - cd target
-          - sh /opt/hongyan/stop.sh
+          - sh /opt/hongyan/run-service.sh stop
           - mv -b -f hongyan-0.0.1-SNAPSHOT.jar /opt/hongyan/hongyan-0.0.1-SNAPSHOT.jar
           - cd /opt/hongyan
-          - 'nohup java -jar hongyan-0.0.1-SNAPSHOT.jar & '
+          - sh /opt/hongyan/run-service.sh start
           - echo "Deploy Success"
           - sleep 10
           - curl 127.0.0.1:80
