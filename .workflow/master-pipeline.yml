@@ -7,6 +7,9 @@ triggers:
     branches:
       include:
         - master
+    commitMessages:
+      include:
+        - 立即发布
 stages:
   - name: compile
     displayName: 编译
