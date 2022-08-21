@@ -23,7 +23,9 @@ public class KeyBloomFilter implements BloomFilter{
         bloomFilter= new SoftReference<>(BloomFilterUtil.createBitSet(size << 1, size, keyHashTimes));
     }
 
-
+    public boolean isEnabled(){
+        return bloomFilter.get()!=null;
+    }
 
     @Override
     public boolean contains(String str) {

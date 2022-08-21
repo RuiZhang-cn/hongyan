@@ -1,0 +1,125 @@
+### date
+GET http://localhost:80/date
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+### 摩斯密码
+GET http://localhost:80/摩斯密码?text=hello
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+### 我的IP
+GET http://localhost:80/我的IP
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+### 获取请求信息
+GET http://localhost:80/获取请求信息
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+### 获取所有方法信息
+GET http://localhost:80/
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+### 创建value
+POST http://localhost:80/测试KEY/测试VALUE
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+### 获取测试KEY
+GET http://localhost:80/测试KEY
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+### 获取不存在KEY
+GET http://localhost:80/不存在KEY
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+### 重定向
+GET http://localhost:80/重定向
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+###
+GET http://localhost:80/代理下载
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+### 动态方法设置
+POST http://localhost:80/dtff1/method:获取请求信息?arg=参数1
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+### 动态方法获取
+GET http://localhost:80/dtff1
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+###
+POST http://localhost:80/getRandomPassWord
+Content-Type: application/json
+
+{
+    "value":"method:getRandomString",
+    "password":""
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+###
+POST http://localhost:80/上传文件
+Content-Type: multipart/form-data;
+
+--WebAppBoundary
+Content-Disposition: form-data; name="body"; filename="README.md"
+
+< README.md
+--WebAppBoundary--
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
