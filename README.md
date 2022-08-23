@@ -73,6 +73,8 @@ curl -X POST -L "http://hongyan.pro/带密码的KEY/密码"
 `curl http://localhost:80/我的IP`
 返回你的出网IP
 `127.0.1`
+##### 重定向
+`curl https://hongyan.pro/redirect?url=https://v1.hitokoto.cn/?c=f&encode=text`
 ##### 获取请求信息
 `curl http://localhost:80/获取请求信息`
 返回你这次请求的所有请求信息 可用于验证代码或者curl命令是否有问题

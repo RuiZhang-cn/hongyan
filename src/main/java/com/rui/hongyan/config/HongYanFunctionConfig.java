@@ -21,6 +21,7 @@ import cn.hutool.http.HttpRequest;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.rui.hongyan.constants.StringPool;
 import com.rui.hongyan.function.HongYanBaseFunction;
 import com.rui.hongyan.function.RandomStringFunction;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.StringJoiner;
 
 import static com.rui.hongyan.utils.ParameterUtil.getOrDefault;
 
@@ -70,7 +73,7 @@ public class HongYanFunctionConfig {
     public HongYanBaseFunction getMyRequestByRequest() {
         return (request, response) -> {
             JSONObject header = new JSONObject();
-            JSONObject root = new JSONObject(3, true);
+            JSONObject root = new JSONObject(4, true);
             Enumeration<String> headerNames = request.getHeaderNames();
             while (headerNames.hasMoreElements()) {
                 String headerKey = headerNames.nextElement();
@@ -247,12 +250,25 @@ public class HongYanFunctionConfig {
     @Bean(name = {"重定向","redirect"})
     public HongYanBaseFunction redirect() {
         return (request, response) -> {
-            String url = request.getParameter("url");
+            String url = request.getParameter(StringPool.intern("url"));
             if (StrUtil.isEmpty(url)) {
-                return "重定向功能需传递参数url,值为要跳转的链接,如?url=baidu.com";
+                return "重定向功能需传递参数url,值为要跳转的链接,如?url=baidu.com,携带参数请直接?url=baidu.com?参数1=参数值1&参数2=参数值2";
+            }
+            Map<String, String[]> parameterMap = request.getParameterMap();
+            StringJoiner urlJoiner;
+            if (url.contains(StringPool.QUESTION_MARK)){
+                urlJoiner = new StringJoiner(StringPool.AMPERSAND, url+StringPool.AMPERSAND, StringPool.EMPTY);
+            }else {
+                urlJoiner = new StringJoiner(StringPool.AMPERSAND, url+StringPool.QUESTION_MARK, StringPool.EMPTY);
+            }
+            for (Map.Entry<String, String[]> stringEntry : parameterMap.entrySet()) {
+                if (StringPool.intern("url").equals(stringEntry.getKey())){
+                    continue;
+                }
+                urlJoiner.add(stringEntry.getKey()+StringPool.EQUALS+stringEntry.getValue()[0]);
             }
             try {
-                response.sendRedirect(url);
+                response.sendRedirect(urlJoiner.toString());
                 return null;
             } catch (IOException e) {
                 e.printStackTrace();

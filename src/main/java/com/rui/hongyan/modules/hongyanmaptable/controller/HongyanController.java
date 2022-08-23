@@ -50,7 +50,7 @@ public class HongyanController {
     public String getAllMethodName(){
         // 返回所有方法bean的name #只取第一个名字#
         String[] beanNamesForType = configurableListableBeanFactory.getBeanNamesForType(HongYanBaseFunction.class);
-        return Arrays.toString(beanNamesForType);
+        return Arrays.toString(beanNamesForType)+"  使用方式请参阅:https://gitee.com/rui2450/hongyan/blob/master/README.md";
     }
 
 
@@ -84,9 +84,8 @@ public class HongyanController {
         HongyanMapTable hongyanMapTable = hongyanMapTableService.getOne(
                 Wrappers.lambdaQuery(HongyanMapTable.class)
                         .eq(HongyanMapTable::getKey, key)
-                        .eq(HongyanMapTable::getPassword,password)
         );
-        if (hongyanMapTable == null) {
+        if (hongyanMapTable == null||!Objects.equals(hongyanMapTable.getPassword(),password)) {
             return KEY_NOT_FOUND_OR_PASSWORD_ERROR;
         }
         String value = hongyanMapTable.getValue();
