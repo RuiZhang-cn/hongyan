@@ -23,6 +23,21 @@ curl -X POST --location "http://localhost:80/测试KEY/测试VALUE"
 接下来在浏览器访问：http://localhost:8080/测试KEY
 或者：`curl -X GET --location "http://localhost:80/测试KEY"`
 即可查询对应的value
+###### 删除或者编辑
+目前hongyan仅支持对带密码的KEY进行删除或者修改操作,在设置KEY的时候指定密码请参考
+
+新增
+```curl
+curl -X POST -L "http://hongyan.pro/带密码的KEY/带密码的VALUE/密码"
+```
+编辑
+```curl
+curl -X POST -L "http://hongyan.pro/带密码的KEY/带密码的新VALUE/密码"
+```
+删除
+```curl
+curl -X POST -L "http://hongyan.pro/带密码的KEY/密码"
+```
 ##### 设置方法和参数作为值
 可以设置如下格式的VALUE来实现调用方法
 如: `method:获取请求信息?arg=参数1&arg2=参数2`

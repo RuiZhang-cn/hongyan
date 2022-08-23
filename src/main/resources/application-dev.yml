@@ -1,0 +1,60 @@
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: rui
+    password:
+    url: jdbc:postgresql://47.100.38.198:5433/dbc63c43bde7064ae7a98b422068ecd026ceshi_db
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initialSize: 5
+      minIdle: 5
+      maxActive: 20
+      maxWait: 60000
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: SELECT 1
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      # 打开PSCache
+      poolPreparedStatements: true
+      # SQL合并配置
+      filters: mergeStat,wall
+      #指定每个连接上PSCache的大小
+      maxPoolPreparedStatementPerConnectionSize: 20
+      #合并多个DruidDataSource的监控数据
+      useGlobalDataSourceStat: true
+      #慢SQL记录
+      filter:
+        stat:
+          log-slow-sql: true
+      # 监控界面配置
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        login-username: rui
+        login-password:
+        reset-enable: true
+server:
+  port: 80
+  tomcat:
+    uri-encoding: UTF-8
+  servlet:
+    encoding:
+      charset: UTF-8
+logging:
+  level:
+    root: debug
+  charset:
+    console: UTF-8
+    file: UTF-8
+  file:
+    name: logs/hongyan.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 20
+      file-name-pattern: og/%d{yyyy-MM}/hongyan.%d{yyyy-MM-dd}.%i.log
+      total-size-cap: 1024MB
+      clean-history-on-start: false
+

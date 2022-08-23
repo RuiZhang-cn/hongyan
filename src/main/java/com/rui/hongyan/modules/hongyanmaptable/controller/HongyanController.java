@@ -8,7 +8,6 @@ import com.rui.hongyan.function.HongYanBaseFunction;
 import com.rui.hongyan.modules.hongyanmaptable.entity.HongyanMapTable;
 import com.rui.hongyan.modules.hongyanmaptable.service.IDynamicMethodService;
 import com.rui.hongyan.modules.hongyanmaptable.service.IHongyanMapTableService;
-import com.rui.hongyan.modules.hongyanmaptable.vo.HongyanMapTableSaveVo;
 import com.rui.hongyan.utils.VerificationUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,10 +84,10 @@ public class HongyanController {
         HongyanMapTable hongyanMapTable = hongyanMapTableService.getOne(
                 Wrappers.lambdaQuery(HongyanMapTable.class)
                         .eq(HongyanMapTable::getKey, key)
-                        .eq(StrUtil.isNotEmpty(password),HongyanMapTable::getPassword,password)
+                        .eq(HongyanMapTable::getPassword,password)
         );
         if (hongyanMapTable == null) {
-            return KEY_NOT_FOUND_OR_KEY_EXIST;
+            return KEY_NOT_FOUND_OR_PASSWORD_ERROR;
         }
         String value = hongyanMapTable.getValue();
         if (value.startsWith(StringPool.METHOD_PREFIX)) {
@@ -147,18 +146,24 @@ public class HongyanController {
         return setValueByKey(key, value,null,request);
     }
 
-
-    @PutMapping("/{key}")
+    @PutMapping("/{key}/{value}")
     public String editValueByKey(@PathVariable String key,
-                                 @RequestBody HongyanMapTableSaveVo hongyanMapTable) {
+                                 @PathVariable String value){
+        return DELETE_IS_NOT_SUPPORTED;
+    }
+
+    @PutMapping("/{key}/{value}/{password}")
+    public String editValueByKey(@PathVariable String key,
+                                 @PathVariable String value,
+                                 @PathVariable String password) {
         // 未设置密码的不允许修改
-        if (StrUtil.isEmpty(hongyanMapTable.getPassword())){
+        if (StrUtil.isBlank(password)){
             return DELETE_IS_NOT_SUPPORTED;
         }
         if (keyBloomFilter.isEnabled()&&!keyBloomFilter.contains(key)){
             return KEY_NOT_FOUND;
         }
-        if (!verificationUtil.checkValueLength(hongyanMapTable.getValue().length())){
+        if (verificationUtil.checkValueLength(password.length())){
             return VALUE_TOO_LONG;
         }
         HongyanMapTable mapTable = hongyanMapTableService.getOne(
@@ -168,9 +173,9 @@ public class HongyanController {
         if (mapTable == null) {
             return KEY_NOT_FOUND;
         }
-        if (mapTable.getPassword().equals(hongyanMapTable.getPassword())) {
+        if (mapTable.getPassword().equals(password)) {
             boolean updateStatus = hongyanMapTableService.updateById(
-                    mapTable.setValue(hongyanMapTable.getValue())
+                    mapTable.setValue(value)
                             .setUpdatedAt(new Date())
             );
             if (updateStatus) {
@@ -184,9 +189,14 @@ public class HongyanController {
     }
 
     @DeleteMapping("/{key}")
+    public String deleteValueByKey(@PathVariable String key) {
+        return DELETE_IS_NOT_SUPPORTED;
+    }
+
+    @DeleteMapping("/{key}/{password}")
     public String deleteValueByKey(@PathVariable String key,
-                                   @RequestBody HongyanMapTableSaveVo hongyanMapTable) {
-        if (StrUtil.isEmpty(hongyanMapTable.getPassword())) {
+                                   @PathVariable String password) {
+        if (StrUtil.isBlank(password)) {
             return DELETE_IS_NOT_SUPPORTED;
         }
         if (keyBloomFilter.isEnabled()&&!keyBloomFilter.contains(key)){
@@ -195,15 +205,14 @@ public class HongyanController {
         HongyanMapTable mapTable = hongyanMapTableService.getOne(
                 Wrappers.lambdaQuery(HongyanMapTable.class)
                         .eq(HongyanMapTable::getKey, key)
-                        .eq(HongyanMapTable::getPassword, hongyanMapTable.getPassword())
+                        .eq(HongyanMapTable::getPassword, password)
                         .select(HongyanMapTable::getId, HongyanMapTable::getPassword));
         if (mapTable == null) {
-            return KEY_NOT_FOUND_OR_KEY_EXIST;
+            return KEY_NOT_FOUND_OR_PASSWORD_ERROR;
         }
         if (hongyanMapTableService.remove(
                 Wrappers.lambdaQuery(HongyanMapTable.class)
                         .eq(HongyanMapTable::getKey, key)
-                        .last("LIMIT 1")
         )) {
             return SUCCESS;
         } else {
