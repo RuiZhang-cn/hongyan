@@ -182,7 +182,18 @@ logging:
       clean-history-on-start: false
 
 ```
-
+建表sql:
+```sql
+create table hongyan_map_table
+(
+    id         bigserial primary key,
+    key        varchar     default ''                not null,
+    value      text                                  not null,
+    password   varchar(30),
+    created_at timestamptz default CURRENT_TIMESTAMP not null,
+    updated_at timestamptz default CURRENT_TIMESTAMP not null
+);
+```
 #### 使用说明
 
 1. 访问当前域名可直接获取到目前所有可执行的方法名
