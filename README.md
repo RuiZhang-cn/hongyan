@@ -112,7 +112,77 @@ curl -X POST -L "http://hongyan.pro/带密码的KEY/密码"
 数据库:MemFire Cloud 免费云数据库
 
 #### 安装教程
-下载最新的jar包执行 `nohop java -jar 包名 &`
+克隆本项目(本项目依赖JDK1.8,以及maven环境),进入到pom.xml同级,执行命令`mvn install package`
+
+等待命令执行完成后去/target目录下,找到hongyan-0.0.1-SNAPSHOT.jar,执行 `nohop java -jar 包名 &`
+
+或者直接去[https://gitee.com/rui2450/hongyan/releases](https://gitee.com/rui2450/hongyan/releases)下载最新的jar包 
+
+记得创建配置文件哦,在jar包同级创建config目录,里面创建application.yml,内容可以参考
+
+``` yml
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: 这里记得改
+    password: 这里记得改
+    url: 这里记得改
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      initialSize: 5
+      minIdle: 5
+      maxActive: 20
+      maxWait: 60000
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: SELECT 1
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      # 打开PSCache
+      poolPreparedStatements: true
+      # SQL合并配置
+      filters: mergeStat,wall
+      #指定每个连接上PSCache的大小
+      maxPoolPreparedStatementPerConnectionSize: 20
+      #合并多个DruidDataSource的监控数据
+      useGlobalDataSourceStat: true
+      #慢SQL记录
+      filter:
+        stat:
+          log-slow-sql: true
+      # 监控界面配置
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        login-username: 这里记得改
+        login-password: 这里记得改
+        reset-enable: true
+server:
+  port: 80
+  tomcat:
+    uri-encoding: UTF-8
+  servlet:
+    encoding:
+      charset: UTF-8
+logging:
+  level:
+    root: debug
+  charset:
+    console: UTF-8
+    file: UTF-8
+  file:
+    name: logs/hongyan.log
+  logback:
+    rollingpolicy:
+      max-file-size: 10MB
+      max-history: 20
+      file-name-pattern: og/%d{yyyy-MM}/hongyan.%d{yyyy-MM-dd}.%i.log
+      total-size-cap: 1024MB
+      clean-history-on-start: false
+
+```
+
 #### 使用说明
 
 1. 访问当前域名可直接获取到目前所有可执行的方法名
