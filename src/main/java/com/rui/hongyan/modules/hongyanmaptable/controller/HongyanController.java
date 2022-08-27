@@ -94,9 +94,9 @@ public class HongyanController {
             try {
                 request.getRequestDispatcher(StringPool.SLASH+value).forward(request,response);
             } catch (ServletException | IOException e) {
-                throw new RuntimeException(e);
+                log.error("已查询到VALUE为:{},重定向过程中发生异常:{}",value,e);
+                return e.getMessage();
             }
-            return null;
         }
         return value;
     }

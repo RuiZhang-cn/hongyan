@@ -24,9 +24,11 @@ import cn.hutool.json.JSONUtil;
 import com.rui.hongyan.constants.StringPool;
 import com.rui.hongyan.function.HongYanBaseFunction;
 import com.rui.hongyan.function.RandomStringFunction;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
@@ -46,6 +48,7 @@ import static com.rui.hongyan.utils.ParameterUtil.getOrDefault;
  * @Date 2022/07/29 上午 11:14
  */
 @Configuration
+@Slf4j
 public class HongYanFunctionConfig {
     @Autowired
     private HongYanConfig hongYanConfig;
@@ -124,6 +127,7 @@ public class HongYanFunctionConfig {
                         ImgUtil.IMAGE_TYPE_JPEG,
                         response.getOutputStream());
             } catch (IOException e) {
+                log.error("生成二维码发生异常:",e);
                 return e.getMessage();
             }
             return "";
@@ -186,14 +190,16 @@ public class HongYanFunctionConfig {
                     return "文件大小为:" + contentLength + "超出限制!";
                 }
             } catch (UtilException e) {
+                log.error("代理下载获取下载文件大小发生异常:",e);
                 return e.getMessage();
             }
             response.setContentType("multipart/form-data");
             response.setCharacterEncoding("UTF-8");
-            response.setHeader("Content-Disposition", "attachment;filename=" + url.substring(url.lastIndexOf("/")));
+            response.setHeader("Content-Disposition", "attachment;filename=" + url.substring(url.lastIndexOf(CharPool.SLASH)));
             try {
                 HttpUtil.download(url, response.getOutputStream(), true);
             } catch (IOException e) {
+                log.error("代理下载下载文件发生异常:",e);
                 return e.getMessage();
             }
             return "nop";
@@ -203,47 +209,47 @@ public class HongYanFunctionConfig {
     @Bean(name = {"上传文件","uploadFile"})
     public HongYanBaseFunction uploadFile() {
         return (request, response) -> {
-            if (false==JakartaServletUtil.METHOD_POST.equals(request.getMethod())){
+            if (!JakartaServletUtil.METHOD_POST.equals(request.getMethod())){
                 return "此方法只支持POST请求";
             }
-            if (request instanceof MultipartHttpServletRequest) {
-                MultipartHttpServletRequest mRequest = (MultipartHttpServletRequest) request;
-                Iterator<String> files = mRequest.getFileNames();
-                JSONObject resJson = new JSONObject();
-                while (files.hasNext()) {
-                    String next = files.next();
-                    MultipartFile file = mRequest.getFile(next);
-                    assert file != null;
-                    String originalFilename = file.getOriginalFilename();
-                    assert originalFilename != null;
-                    String suffix = originalFilename.substring(originalFilename.lastIndexOf(StrUtil.DOT));
-                    String newFileName = IdUtil.fastSimpleUUID().concat(suffix);
-                    File tempFile = FileUtil.createTempFile(newFileName, null, true);
-                    try {
-                        file.transferTo(tempFile);
-                        String resBody = HttpRequest.post(hongYanConfig.getUploadFileUrl() + newFileName)
-                                .header("apikey", hongYanConfig.getUploadFileApikey())
-                                .header("authorization", "Bearer "+ hongYanConfig.getUploadFileApikey())
-                                .form("body",tempFile)
-                                .execute()
-                                .body();
-                        JSONObject entries = JSONUtil.parseObj(resBody);
-                        //上传失败
-                        if (!entries.containsKey("Key")) {
-                            resJson.set(next, entries.toString());
-                        }else {
-                            resJson.set(next, hongYanConfig.getUploadFilePreviewUrl()+newFileName);
-                        }
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }finally {
-                        FileUtil.del(tempFile);
-                    }
-                }
-                return resJson.toStringPretty();
-            } else {
+            if (!(request instanceof MultipartHttpServletRequest)) {
                 return "请求格式错误,仅支持文件上传";
             }
+            MultipartHttpServletRequest mRequest = (MultipartHttpServletRequest) request;
+            Iterator<String> files = mRequest.getFileNames();
+            JSONObject resJson = new JSONObject();
+            while (files.hasNext()) {
+                String next = files.next();
+                MultipartFile file = mRequest.getFile(next);
+                Assert.notNull(file,"参数file不应为null！");
+                String originalFilename = file.getOriginalFilename();
+                Assert.notNull(originalFilename,"参数originalFilename不应为null！");
+                String suffix = originalFilename.substring(originalFilename.lastIndexOf(StrUtil.DOT));
+                String newFileName = IdUtil.fastSimpleUUID().concat(suffix);
+                File tempFile = FileUtil.createTempFile(newFileName, null, true);
+                try {
+                    file.transferTo(tempFile);
+                    String resBody = HttpRequest.post(hongYanConfig.getUploadFileUrl() + newFileName)
+                            .header("apikey", hongYanConfig.getUploadFileApikey())
+                            .header("authorization", "Bearer "+ hongYanConfig.getUploadFileApikey())
+                            .form("body",tempFile)
+                            .execute()
+                            .body();
+                    JSONObject entries = JSONUtil.parseObj(resBody);
+                    //上传失败
+                    if (!entries.containsKey("Key")) {
+                        resJson.set(next, entries.toString());
+                    }else {
+                        resJson.set(next, hongYanConfig.getUploadFilePreviewUrl()+newFileName);
+                    }
+                } catch (IOException e) {
+                    log.error("上传文件发生异常:",e);
+                    return e.getMessage();
+                }finally {
+                    FileUtil.del(tempFile);
+                }
+            }
+            return resJson.toStringPretty();
         };
     }
 
@@ -271,8 +277,8 @@ public class HongYanFunctionConfig {
                 response.sendRedirect(urlJoiner.toString());
                 return null;
             } catch (IOException e) {
-                e.printStackTrace();
-                return null;
+                log.error("重定向功能重定向发生异常:",e);
+                return e.getMessage();
             }
         };
     }
