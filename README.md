@@ -16,12 +16,12 @@ hongyan 是一个终端便利的工具集合体,你可以用他来储存/分享�
 在命令终端执行（cmd/或者bash）
 
 ``` curl 
-curl -X POST --location "http://localhost:80/测试KEY/测试VALUE"
+curl -X POST "https://hongyan.pro/测试KEY/测试VALUE"
 ```
 
 即成功设置了一个key为测试KEY，value为测试VALUE的对象
-接下来在浏览器访问：http://localhost:8080/测试KEY
-或者：`curl -X GET --location "http://localhost:80/测试KEY"`
+接下来在浏览器访问：https://hongyan.pro/测试KEY
+或者：`curl -X GET "https://hongyan.pro/测试KEY"`
 即可查询对应的value
 ###### 删除或者编辑
 目前hongyan仅支持对带密码的KEY进行删除或者修改操作,在设置KEY的时候指定密码请参考
@@ -44,12 +44,12 @@ curl -X POST -L "http://hongyan.pro/带密码的KEY/密码"
 
 其中`method:`是固定前缀,`获取请求信息`是要调用的方法,`?arg=参数1&arg2=参数2`是要传递的参数,使用url参数格式
 
-例:`curl -X POST --location "http://localhost:80/dtff1/method:获取请求信息?arg=%E5%8F%82%E6%95%B01"`
+例:`curl -X POST --location "https://hongyan.pro/dtff1/method:获取请求信息?arg=%E5%8F%82%E6%95%B01"`
 
 返回值:
 ```json
 {
-    "url": "http://localhost/获取请求信息",
+    "url": "https://hongyan.pro/获取请求信息",
     "args": {
         "arg": [
             "参数1"
@@ -70,21 +70,23 @@ curl -X POST -L "http://hongyan.pro/带密码的KEY/密码"
 
 ##### 获取本机IP
 
-`curl http://localhost:80/我的IP`
+`curl https://hongyan.pro/我的IP`
 返回你的出网IP
 `127.0.1`
 ##### 重定向
+以跳转到一言为例,url=你要跳转的链接可以跟普通的请求一样传递参数?c=f&encode=text
+
 `curl https://hongyan.pro/redirect?url=https://v1.hitokoto.cn/?c=f&encode=text`
 ##### 获取请求信息
-`curl http://localhost:80/获取请求信息`
+`curl https://hongyan.pro/获取请求信息`
 返回你这次请求的所有请求信息 可用于验证代码或者curl命令是否有问题
 ```json
 {
-  "url": "http://localhost/获取请求信息",
+  "url": "https://hongyan.pro/获取请求信息",
   "args": {
   },
   "header": {
-    "host": "103.233.255.220:80",
+    "host": "https://hongyan.pro",
     "connection": "Keep-Alive",
     "user-agent": "Apache-HttpClient/4.5.13 (Java/17.0.3)",
     "accept-encoding": "gzip,deflate"
@@ -92,7 +94,7 @@ curl -X POST -L "http://hongyan.pro/带密码的KEY/密码"
 }
 ```
 ###### 时间转换
-`curl http://localhost:80/时间转换`
+`curl https://hongyan.pro/时间转换`
 默认返回当前时间和时间戳
 ```json
 {
@@ -104,7 +106,7 @@ curl -X POST -L "http://hongyan.pro/带密码的KEY/密码"
 ```
 ###### 摩斯密码
 摩斯密码功能需传递参数text如 /摩斯密码?text=a,自动识别加密或者解密
-`curl http://localhost:80/摩斯密码?text=hello`
+`curl https://hongyan.pro/摩斯密码?text=hello`
 
 `...././.-../.-../---/`
 #### 软件架构
