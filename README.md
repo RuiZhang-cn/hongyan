@@ -169,7 +169,7 @@ server:
       charset: UTF-8
 logging:
   level:
-    root: debug
+    root: info
   charset:
     console: UTF-8
     file: UTF-8
@@ -179,7 +179,7 @@ logging:
     rollingpolicy:
       max-file-size: 10MB
       max-history: 20
-      file-name-pattern: og/%d{yyyy-MM}/hongyan.%d{yyyy-MM-dd}.%i.log
+      file-name-pattern: logs/%d{yyyy-MM}/hongyan.%d{yyyy-MM-dd}.%i.log
       total-size-cap: 1024MB
       clean-history-on-start: false
 
