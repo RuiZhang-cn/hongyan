@@ -88,7 +88,12 @@ public class HongYanFunctionConfig {
             if (request.getContentType()!=null&&request.getContentType().equalsIgnoreCase(ContentType.JSON.getValue())){
                 try {
                     String value = new String(IoUtil.readBytes(request.getInputStream(), false), StandardCharsets.UTF_8);
-                    root.set("args", JSONUtil.parse(value));
+                    // 进行json转换之前 简单的判断是否为json
+                    if (JSONUtil.isTypeJSONObject(value)){
+                        root.set("args", JSONUtil.parse(value));
+                    }else {
+                        root.set("args", value);
+                    }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
