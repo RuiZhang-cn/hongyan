@@ -31,6 +31,7 @@ import static com.rui.hongyan.constants.MessageConstant.*;
  */
 @RestController
 @Slf4j
+@CrossOrigin(origins = "*")
 public class HongyanController {
     @Autowired
     private IHongyanMapTableService hongyanMapTableService;
