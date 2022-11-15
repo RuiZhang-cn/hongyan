@@ -146,10 +146,20 @@ public class HongyanController {
         return setValueByKey(key, value,null,request);
     }
 
+    @PostMapping("/")
+    public String setValueByKey(@RequestBody HongyanMapTable hongyanMapTable,HttpServletRequest request) {
+        return setValueByKey(hongyanMapTable.getKey(), hongyanMapTable.getValue(),hongyanMapTable.getPassword(),request);
+    }
+
     @PutMapping("/{key}/{value}")
     public String editValueByKey(@PathVariable String key,
                                  @PathVariable String value){
         return DELETE_IS_NOT_SUPPORTED;
+    }
+
+    @PutMapping("/")
+    public String editValueByKey(@RequestBody HongyanMapTable hongyanMapTable){
+        return editValueByKey(hongyanMapTable.getKey(),hongyanMapTable.getValue(),hongyanMapTable.getPassword());
     }
 
     @PutMapping("/{key}/{value}/{password}")

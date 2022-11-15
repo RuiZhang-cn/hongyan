@@ -54,6 +54,6 @@ public class VerificationUtil {
     }
 
     public boolean checkValueLength(int valueLength){
-        return valueLength>config.getMaxKeyLength();
+        return valueLength>config.getMaxValueLength();
     }
 }

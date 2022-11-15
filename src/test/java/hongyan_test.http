@@ -86,8 +86,24 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
 });
 %}
+
+### 动态方法JOSN设置
+POST http://localhost:80/
+Content-Type: application/json
+
+{
+  "key": "@Autowired和@Resource的区别",
+  "value": "method:redirect?url=https://blog.csdn.net/qq_45590494/article/details/114444371"
+}
+
+> {%
+client.test("Request executed successfully", function() {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
 ### 动态方法获取
-GET http://localhost:80/dtff1
+GET http://localhost:80/@Autowired和@Resource的区别
 
 > {%
 client.test("Request executed successfully", function() {

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Data
 public class HongYanConfig {
-    private int maxKeyLength=20;
+    private int maxKeyLength=30;
     private int bloomFilterMinLength=100000;
     private int bloomFilterKeyHashTimes=4;
     private int maxValueLength=2000;
