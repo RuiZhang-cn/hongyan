@@ -139,3 +139,11 @@ client.test("Request executed successfully", function() {
   client.assert(response.status === 200, "Response status is not 200");
 });
 %}
+### 获取网站基础信息
+GET http://localhost:80/网站信息?url=https://baidu.com
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200");
+    });
+%}

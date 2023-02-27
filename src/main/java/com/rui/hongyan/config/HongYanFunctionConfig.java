@@ -9,15 +9,13 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.net.URLDecoder;
 import cn.hutool.core.text.CharPool;
-import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.NumberUtil;
-import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.*;
 import cn.hutool.extra.qrcode.QrCodeUtil;
 import cn.hutool.extra.servlet.JakartaServletUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.http.ContentType;
 import cn.hutool.http.HttpRequest;
+import cn.hutool.http.HttpResponse;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -25,6 +23,9 @@ import com.rui.hongyan.constants.StringPool;
 import com.rui.hongyan.function.HongYanBaseFunction;
 import com.rui.hongyan.function.RandomStringFunction;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,11 +35,9 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.util.*;
 
 import static com.rui.hongyan.utils.ParameterUtil.getOrDefault;
 
@@ -285,6 +284,55 @@ public class HongYanFunctionConfig {
                 log.error("重定向功能重定向发生异常:",e);
                 return e.getMessage();
             }
+        };
+    }
+
+    @Bean(name = {"网站信息","getBasicWebsiteInformation"})
+    public HongYanBaseFunction getBasicWebsiteInformation(){
+        return (request, response) -> {
+            String urlStr = request.getParameter(StringPool.intern("url"));
+            if (StrUtil.isBlank(urlStr)){
+                return "请传递参数?url=";
+            }
+            if (false == HttpUtil.isHttp(urlStr) && false == HttpUtil.isHttps(urlStr)){
+                return "请输入以HTTP或者HTTPS开头的url!";
+            }
+            final JSONObject res = new JSONObject();
+            final URL url = URLUtil.url(urlStr);
+            final String simpleUrl = url.getHost() + "/favicon.ico";
+
+            final HttpResponse urlRes = HttpUtil.createGet(urlStr, true)
+                    .timeout(2000)
+                    .executeAsync();
+            if (urlRes.isOk()){
+                final String htmlPage = urlRes.body();
+                final Document document = Jsoup.parse(htmlPage, urlStr);
+                final Element titleElement = document.selectFirst("head > title");
+                assert titleElement != null;
+                res.set("title", titleElement.text());
+                final Element iconElement = document.selectFirst("link[rel=\"shortcut icon\"], link[rel=\"icon\"]");
+                if (iconElement == null) {
+                    final HttpResponse iconRes = HttpUtil.createGet(simpleUrl, true)
+                            .timeout(2000)
+                            .executeAsync();
+                    if (iconRes.isOk()){
+                        final String iconBase64 = Base64.getEncoder().encodeToString(iconRes.bodyBytes());
+                        res.set("icon",iconBase64);
+                    }
+                }else {
+                    final String href = iconElement.absUrl("href");
+                    if (HttpUtil.isHttps(href) || HttpUtil.isHttp(href)){
+                        final byte[] bodyBytes = HttpUtil.createGet(href, true)
+                                .timeout(2000)
+                                .execute()
+                                .bodyBytes();
+                        res.set("icon",Base64.getEncoder().encodeToString(bodyBytes));
+                    }else {
+                        res.set("icon",href);
+                    }
+                }
+            }
+            return res.toJSONString(4);
         };
     }
 }
