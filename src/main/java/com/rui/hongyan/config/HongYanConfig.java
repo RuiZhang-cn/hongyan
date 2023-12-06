@@ -14,12 +14,12 @@ import org.springframework.stereotype.Component;
 @Component
 @Data
 public class HongYanConfig {
-    private int maxKeyLength=30;
-    private int bloomFilterMinLength=100000;
-    private int bloomFilterKeyHashTimes=4;
-    private int maxValueLength=2000;
-    private int maxProxyDownloadFileSize=300000;
-    private String uploadFileUrl="https://c6cgg225g6h1m0ol6ocg.baseapi.memfiredb.com/storage/v1/object/randomchat/";
-    private String uploadFilePreviewUrl="https://c6cgg225g6h1m0ol6ocg.baseapi.memfiredb.com/storage/v1/object/public/randomchat/";
-    private String uploadFileApikey="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiZXhwIjozMTc1MzM5MDI2LCJpYXQiOjE2Mzc0MTkwMjYsImlzcyI6InN1cGFiYXNlIn0.XACnBFPeQVwXJvTamLFywWzsnwonq7nV9xDZGOrzM1w";
+    private int maxKeyLength = 30;
+    private int bloomFilterMinLength = 100000;
+    private int bloomFilterKeyHashTimes = 4;
+    private int maxValueLength = 2000;
+    private int maxProxyDownloadFileSize = 300000;
+    private String uploadFileUrl = "https://c6cgg225g6h1m0ol6ocg.baseapi.memfiredb.com/storage/v1/object/randomchat/";
+    private String uploadFilePreviewUrl = "https://c6cgg225g6h1m0ol6ocg.baseapi.memfiredb.com/storage/v1/object/public/randomchat/";
+    private String uploadFileApikey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoic2VydmljZV9yb2xlIiwiZXhwIjozMTc1MzM5MDI2LCJpYXQiOjE2Mzc0MTkwMjYsImlzcyI6InN1cGFiYXNlIn0.XACnBFPeQVwXJvTamLFywWzsnwonq7nV9xDZGOrzM1w";
 }
