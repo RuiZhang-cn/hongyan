@@ -89,16 +89,15 @@ public class HongYanFunctionConfig {
                     String value = new String(IoUtil.readBytes(request.getInputStream(), false), StandardCharsets.UTF_8);
                     // 进行json转换之前 简单的判断是否为json
                     if (JSONUtil.isTypeJSONObject(value)){
-                        root.set("args", JSONUtil.parse(value));
+                        root.set("body", JSONUtil.parse(value));
                     }else {
-                        root.set("args", value);
+                        root.set("body", value);
                     }
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-            }else {
-                root.set("args", request.getParameterMap());
             }
+            root.set("args", request.getParameterMap());
             root.set("header", header);
             return JSONUtil.toJsonPrettyStr(root);
         };
@@ -181,7 +180,7 @@ public class HongYanFunctionConfig {
         };
     }
 
-    @Bean(name = {"代理下载"})
+    @Bean(name = {"代理下载","dl"})
     public HongYanBaseFunction proxyDownload() {
         return (request, response) -> {
             String url = request.getParameter("url");

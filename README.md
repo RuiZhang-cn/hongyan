@@ -111,7 +111,7 @@ curl -X POST -L "http://hongyan.pro/带密码的KEY/密码"
 `...././.-../.-../---/`
 #### 软件架构
 开发框架:SpringBoot+Druid+Mybatis-plus+Hutool工具包
-数据库:MemFire Cloud 免费云数据库
+数据库: sqlite
 
 #### 安装教程
 克隆本项目(本项目依赖JDK1.8,以及maven环境),进入到pom.xml同级,执行命令`mvn install package`
@@ -125,10 +125,10 @@ curl -X POST -L "http://hongyan.pro/带密码的KEY/密码"
 ``` yml
 spring:
   datasource:
-    driver-class-name: org.postgresql.Driver
-    username: 这里记得改
-    password: 这里记得改
-    url: 这里记得改
+    # sqlite
+    driver-class-name: org.sqlite.JDBC
+    # 全路径
+    url: jdbc:sqlite:/data/hongyan.db
     type: com.alibaba.druid.pool.DruidDataSource
     druid:
       initialSize: 5
@@ -188,12 +188,12 @@ logging:
 ```sql
 create table hongyan_map_table
 (
-    id         bigserial primary key,
-    key        varchar     default ''                not null,
+    id         INTEGER  primary key AUTOINCREMENT,
+    key        text     default ''                not null,
     value      text                                  not null,
-    password   varchar(30),
-    created_at timestamptz default CURRENT_TIMESTAMP not null,
-    updated_at timestamptz default CURRENT_TIMESTAMP not null
+    password   text,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 ```
 #### 使用说明

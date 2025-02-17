@@ -26,22 +26,9 @@ import javax.servlet.http.HttpServletResponse;
 @Component
 @Slf4j
 public class ControllerLogAspect {
-    @Autowired
-    @Qualifier("myreq")
-    private HongYanBaseFunction getMyRequestByRequest;
 
     @Pointcut("execution(public * com.rui.hongyan.modules.hongyanmaptable.controller..*.*(..))")
     public void controllerPointcut() {
-    }
-
-    @Before("controllerPointcut()")
-    public void reqLog(JoinPoint joinPoint) throws Exception{
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        assert attributes != null;
-        HttpServletRequest request = attributes.getRequest();
-        HttpServletResponse res = attributes.getResponse();
-        String reqDescription = getMyRequestByRequest.apply(request, res);
-        log.info("用户请求进入,请求信息为:{}",reqDescription);
     }
 
     @AfterReturning(returning = "res",pointcut = "controllerPointcut()")
